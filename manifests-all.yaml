@@ -349,12 +349,10 @@ metadata:
 spec:
   selector:
     app: alertmanager
-  type: NodePort
   ports:
   - name: alertmanager
     protocol: TCP
     port: 9093
-    targetPort: 9093
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -2342,7 +2340,6 @@ metadata:
     app: grafana
     component: core
 spec:
-  type: NodePort
   ports:
     - port: 3000
   selector:
@@ -2830,11 +2827,46 @@ metadata:
   annotations:
     prometheus.io/scrape: 'true'
 spec:
-  type: NodePort
   ports:
     - port: 9090
       protocol: TCP
       name: webui
   selector:
     app: prometheus
+    component: core
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-svc
+  namespace: monitoring
+  labels:
+    app: prometheus-svc
+    component: core
+  annotations:
+    prometheus.io/scrape: 'true'
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 9090
+      protocol: TCP
+      name: webui
+  selector:
+    app: prometheus
+    component: core
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-svc
+  namespace: monitoring
+  labels:
+    app: grafana-svc
+    component: core
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 3000
+  selector:
+    app: grafana
     component: core
